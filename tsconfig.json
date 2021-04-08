@@ -13,12 +13,19 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "component/*": ["components/*"],
-      "styles/*": ["styles/*"]
+      "@containers/*": ["containers/*"],
+      "@components/*": ["components/*"],
+      "@styles/*": ["styles/*"],
+      "@service/*": ["services/*"],
+      "@repos/*": ["repos/*"],
+      "@hooks/*": ["hooks/*"],
+      "@config/*": ["configs/*"],
+      "@constants/*": ["constants/*"],
+      "@utils": ["utils"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.css"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.css", "next.config.js"],
   "exclude": ["node_modules"]
 }
