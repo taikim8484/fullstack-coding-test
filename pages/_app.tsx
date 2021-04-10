@@ -1,4 +1,5 @@
 import "styles/globals.css";
+import "react-datepicker/dist/react-datepicker.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import PageWrapper from "@components/PageLayout";
 import PageGuard from "@components/PageGuard";

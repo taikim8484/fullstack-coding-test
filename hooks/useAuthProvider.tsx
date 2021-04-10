@@ -1,27 +1,8 @@
 import React, { createContext, useReducer, useContext, useEffect, useCallback, useState } from "react";
+import usersService from "@service/users";
 
-import { AUTH_ACTION } from "@constants/auth";
+import { AUTH_ACTION, LOCAL_STORAGE_TOKEN_KEY } from "@constants/auth";
 import { isClientContext } from "@utils";
-
-const AUTH = "AUTH";
-
-const persistState = (storageKey: string, state: object): void => {
-  isClientContext() && window.localStorage.setItem(storageKey, JSON.stringify(state));
-};
-
-const getIntialState = (storageKey: string): any => {
-  if (isClientContext()) {
-    const savedState = window.localStorage.getItem(storageKey);
-    try {
-      if (!savedState) {
-        return initialValues;
-      }
-      return JSON.parse(savedState);
-    } catch (e) {
-      return initialValues;
-    }
-  }
-};
 
 const initialValues = {
   currentUser: null,
@@ -68,14 +49,23 @@ function AuthProvider({ children }) {
   }, [dispatch]);
 
   useEffect(() => {
-    const { currentUser } = getIntialState(AUTH);
-    if (currentUser) {
-      setUser(currentUser);
+    if (localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY)) {
+      usersService
+        .me()
+        .then(({ user }) => {
+          if (user) {
+            setUser(user);
+          }
+          setRehydrating(true);
+        })
+        .catch(() => {
+          isClientContext && localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+          setRehydrating(true);
+        });
+    } else {
+      setRehydrating(true);
     }
-    setRehydrating(true);
   }, [setUser]);
-
-  useEffect(() => persistState(AUTH, state), [state]);
 
   return (
     <AuthStateContext.Provider

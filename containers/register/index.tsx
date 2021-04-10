@@ -1,12 +1,17 @@
 import { Button } from "@chakra-ui/button";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
+import { chakra } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/input";
+import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Box, Link, Stack, Text } from "@chakra-ui/layout";
-import { useFormik } from "formik";
 
-import { useAuthDispatch } from "@hooks/useAuthProvider";
+import { useFormik } from "formik";
+import DatePicker from "react-datepicker";
+
+const StyledDatePicker = chakra(DatePicker);
+
 import authService from "@service/auth";
 import useToast from "@hooks/useToast";
+import { useRouter } from "next/router";
 
 export async function getStaticProps() {
   return {
@@ -15,23 +20,25 @@ export async function getStaticProps() {
 }
 
 const SignUp = () => {
-  const { setUser } = useAuthDispatch();
+  const router = useRouter();
   const { errorToast, successToast } = useToast();
   const onSubmit = async (values) => {
-    const { email, password } = values;
+    const { email, password, name, dateOfBirth } = values;
     try {
-      const { user } = await authService.signUp({ email, password });
+      await authService.signUp({ email, password, name, dateOfBirth });
       successToast("Register succeed", "Go to home..");
-      setUser(user);
+      router.replace("/login");
     } catch (error) {
       errorToast("Register failed", error.message);
     }
   };
 
-  const { handleSubmit, handleChange, values, isSubmitting } = useFormik({
+  const { handleSubmit, setFieldValue, handleChange, values, isSubmitting } = useFormik({
     initialValues: {
       email: "",
       password: "",
+      name: "",
+      dateOfBirth: new Date(),
     },
     onSubmit,
   });
@@ -48,6 +55,20 @@ const SignUp = () => {
             <FormControl id="password">
               <FormLabel>password</FormLabel>
               <Input type="password" onChange={handleChange} value={values.password} />
+            </FormControl>
+            <FormControl id="name">
+              <FormLabel>name</FormLabel>
+              <Input type="name" onChange={handleChange} value={values.name} />
+            </FormControl>
+            <FormControl id="dateOfBirth">
+              <FormLabel>birthday</FormLabel>
+              <StyledDatePicker
+                border="wheat"
+                selected={values.dateOfBirth}
+                onChange={(value) => {
+                  setFieldValue("dateOfBirth", value);
+                }}
+              />
             </FormControl>
             <Button isLoading={isSubmitting} colorScheme="teal" type="submit">
               register
